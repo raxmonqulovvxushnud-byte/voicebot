@@ -1,4 +1,2 @@
 python-telegram-bot==22.7
 httpx
-pyaudioop
-pydub==0.25.1
