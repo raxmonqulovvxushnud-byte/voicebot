@@ -1,5 +1,5 @@
 import os
-import subprocess
+from pydub import AudioSegment
 from telegram import Update
 from telegram.ext import Application, MessageHandler, CommandHandler, ConversationHandler, filters, ContextTypes
 
@@ -26,7 +26,6 @@ async def text_received(update: Update, context: ContextTypes.DEFAULT_TYPE):
     file = await context.bot.get_file(file_id)
     await file.download_to_drive("input_video.mp4")
 
-    from pydub import AudioSegment
     audio = AudioSegment.from_file("input_video.mp4")
     audio.export("output_audio.mp3", format="mp3")
 
