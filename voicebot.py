@@ -27,7 +27,7 @@ async def text_received(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("⏳ Tayyorlanmoqda...")
 
-    ffmpeg_path = os.path.join(os.path.dirname(__file__), "ffmpeg")
+    ffmpeg_path = "ffmpeg"
     subprocess.run([
         ffmpeg_path, "-y", "-i", "input_video.mp4",
         "-vn", "-acodec", "libmp3lame", "output_audio.mp3"
@@ -76,4 +76,4 @@ def main():
     app.run_polling()
 
 if __name__ == "__main__":
-    main()
+    main()oaoidhg;ohas
