@@ -3,7 +3,7 @@ import subprocess
 from telegram import Update
 from telegram.ext import Application, MessageHandler, CommandHandler, ConversationHandler, filters, ContextTypes
 
-TOKEN = "8286492634:AAHF5NBCiz6TxfV1uLY52jWXyPwQeFtfJfY"
+TOKEN = os.environ.get("TOKEN")
 
 WAITING_TEXT = 1
 
@@ -13,23 +13,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def video_received(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = await update.message.reply_text("⏳ Video yuklanmoqda...")
-    
-    file = await update.message.video.get_file()
-    await file.download_to_drive("input_video.mp4")
-    
-    context.user_data["has_video"] = True
-    await msg.edit_text("✏️ Matnni kiriting:")
+    context.user_data["file_id"] = update.message.video.file_id
+    await update.message.reply_text("✏️ Matnni kiriting:")
     return WAITING_TEXT
 
 async def text_received(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
+    file_id = context.user_data.get("file_id")
 
-    await update.message.reply_text("⏳ Tayyorlanmoqda...")
+    msg = await update.message.reply_text("⏳ Tayyorlanmoqda...")
 
-    ffmpeg_path = "ffmpeg"
+    file = await context.bot.get_file(file_id)
+    await file.download_to_drive("input_video.mp4")
+
     subprocess.run([
-        ffmpeg_path, "-y", "-i", "input_video.mp4",
+        "ffmpeg", "-y", "-i", "input_video.mp4",
         "-vn", "-acodec", "libmp3lame", "output_audio.mp3"
     ])
 
@@ -52,6 +50,7 @@ async def text_received(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if os.path.exists("output_audio.mp3"):
         os.remove("output_audio.mp3")
 
+    await msg.delete()
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
